@@ -2,6 +2,7 @@ import time
 import uuid
 from unittest.mock import patch
 
+from django.conf import settings
 from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 
@@ -48,21 +49,22 @@ class RunnerTests(SimpleTestCase):
 
 class CronViewTests(SimpleTestCase):
     def test_root_lists_jobs(self):
-        response = self.client.get(reverse("cron_tasks:root"))
+        response = self.client.get(reverse("cron_tasks:root"), {"token": settings.CRON_SECRET})
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("fetch_all", response.json()["jobs"])
 
     @patch("cron_tasks.views.jobs.fetch_all_sources", return_value={"total": 0})
     def test_fetch_all_returns_202(self, _fetch_all):
-        response = self.client.get(reverse("cron_tasks:fetch-all"))
+        response = self.client.get(reverse("cron_tasks:fetch-all"), {"token": settings.CRON_SECRET})
 
         self.assertEqual(response.status_code, 202)
         self.assertIn("run_id", response.json())
 
     def test_unknown_fetch_command_returns_404(self):
         response = self.client.get(
-            reverse("cron_tasks:fetch-one", args=["not_a_command"])
+            reverse("cron_tasks:fetch-one", args=["not_a_command"]),
+            {"token": settings.CRON_SECRET},
         )
 
         self.assertEqual(response.status_code, 404)

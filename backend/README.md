@@ -1,6 +1,6 @@
-# UbuntuReport API
+# PanAfricanReport API
 
-**Project Name:** UbuntuReport
+**Project Name:** PanAfricanReport
 
 **Author:** Adesina Olagunju ([daadesina1@gmail.com](mailto:daadesina1@gmail.com))
 
@@ -10,7 +10,7 @@
 
 ## Table of Contents
 
-- [UbuntuReport API](#ubuntureport-api)
+- [PanAfricanReport API](#PanAfricanReportAPI)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Features](#features)
@@ -30,7 +30,7 @@
 
 ## Overview
 
-**UbuntuReport** is a Django-based API designed to aggregate news articles from multiple international sources and provide users with fast access to news across various categories. It fetches news via RSS feeds, stores them in a database, and exposes searchable and filterable REST API endpoints.
+**PanAfricanReport** is a Django-based API designed to aggregate news articles from multiple international sources and provide users with fast access to news across various categories. It fetches news via RSS feeds, stores them in a database, and exposes searchable and filterable REST API endpoints.
 
 ---
 
@@ -65,7 +65,7 @@
 
 ```bash
 git clone <repository_url>
-cd emergency_news
+cd panafricanreport
 ```
 
 2. Create a virtual environment and activate it:
@@ -165,7 +165,7 @@ Periodic work is triggered by an external cron/ping service. The endpoints
 return `202 Accepted` immediately and run the work in a background thread pool
 inside the web process.
 
-> The old Celery/Redis/Docker files may still be present in the repository for
+> The old Celery/Redis files may still be present in the repository for
 > reference, but the application no longer starts or requires them.
 
 | Method | Endpoint | Description |

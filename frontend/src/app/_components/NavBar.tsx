@@ -25,8 +25,8 @@ export default function NavBar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <img
-              src="/images/UbuntuReport_logo.png"
-              alt="UbuntuReport"
+              src="/images/PanAfricanReport_logo.png"
+              alt="PanAfricanReport"
               className="h-10 w-auto"
             />
           </Link>

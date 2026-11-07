@@ -8,7 +8,7 @@ import os
 
 import django
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "emergency_news.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "panafricanreport.settings")
 django.setup()
 
 from cron_tasks.jobs import fetch_all_sources

@@ -11,7 +11,7 @@ def hello_world(request):
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="UbuntuReport API",
+        title="PanAfricanReport API",
         default_version='v1',
         description="Aggregated African breaking news from multiple sources.",
         contact=openapi.Contact(email="adesinaolagunju1@gmail.com"),

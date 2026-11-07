@@ -1,4 +1,4 @@
-# global_emergency_news/docker-compose.yml
+# panafricanreport/docker-compose.yml
 
 version: "3.9"
 

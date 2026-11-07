@@ -22,24 +22,24 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Ubuntu Report — Pan-African News & Perspectives",
-    template: "%s | Ubuntu Report",
+    default: "Pan-African Report — Pan-African News & Perspectives",
+    template: "%s | Pan-African Report",
   },
   description:
-    "Ubuntu Report is a pan-African news platform delivering trusted, balanced, and African-centered reporting from every country across the continent.",
+    "Pan-African Report is a pan-African news platform delivering trusted, balanced, and African-centered reporting from every country across the continent.",
   metadataBase: new URL(UBUNTU_REPORT_URL), // change to your real domain
   openGraph: {
-    title: "Ubuntu Report — Pan-African News & Perspectives",
+    title: "Pan-African Report — Pan-African News & Perspectives",
     description:
       "News from every African country. African stories, told with context, dignity, and unity.",
     url: UBUNTU_REPORT_URL,
-    siteName: "Ubuntu Report",
+    siteName: "Pan-African Report",
     images: [
       {
-        url: "/og/ubuntu-report.png", // put this in /public/og/
+        url: "/og/pan-african-report.png", // put this in /public/og/
         width: 1200,
         height: 630,
-        alt: "Ubuntu Report — Pan-African News",
+        alt: "Pan-African Report — Pan-African News",
       },
     ],
     locale: "en_US",
@@ -47,10 +47,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ubuntu Report — Pan-African News & Perspectives",
+    title: "Pan-African Report — Pan-African News & Perspectives",
     description:
       "All of Africa, one newsroom. Trusted reporting from across the continent.",
-    images: ["/og/ubuntu-report.png"],
+    images: ["/og/pan-african-report.png"],
   },
   robots: {
     index: true,
