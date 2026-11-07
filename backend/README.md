@@ -21,7 +21,7 @@
   - [API Endpoints](#api-endpoints)
     - [News Articles](#news-articles)
     - [Categories](#categories)
-  - [Celery \& Scheduled Tasks](#celery--scheduled-tasks)
+  - [Cron Endpoints](#cron-endpoints)
   - [Models](#models)
     - [NewsArticle](#newsarticle)
   - [License](#license)
@@ -42,7 +42,7 @@
 * Categorized news articles
 * Automatic deduplication of articles
 * Searchable and filterable API endpoints
-* Scheduled fetching of news every hour using Celery and Redis
+* Scheduled fetching of news triggered by an external cron/ping service
 * REST API with pagination
 
 ---
@@ -53,8 +53,8 @@
 * Django 5.2
 * Django REST Framework (DRF)
 * Django Filters
-* Celery (with Redis broker)
-* SQLite (default, can be changed)
+* PostgreSQL (Supabase in production)
+* External cron/ping service for scheduled runs
 * Feedparser for RSS feed parsing
 
 ---
@@ -97,12 +97,9 @@ python manage.py createsuperuser
 
 ## Configuration
 
-* **Database:** By default, the project uses SQLite. Update `DATABASES` in `emergency_news/settings.py` for PostgreSQL or other databases.
-* **Celery:** Requires Redis. Update the broker URL in `emergency_news/celery.py` if needed:
-
-```python
-app = Celery('emergency_news', broker='redis://localhost:6379/0')
-```
+* **Database:** Configure `DATABASE_URL` for PostgreSQL/Supabase.
+* **Cron authentication:** Set `CRON_SECRET` to require `X-Cron-Secret` or `?token=...` on cron endpoints. If unset, the endpoints are open.
+* **Cron concurrency:** `CRON_FETCH_CONCURRENCY` controls how many sources fetch in parallel (default 4); `CRON_MAX_WORKERS` controls the async job pool (default 4).
 
 ---
 
@@ -114,24 +111,19 @@ app = Celery('emergency_news', broker='redis://localhost:6379/0')
 python manage.py runserver
 ```
 
-2. Start Celery worker:
+2. Point your external cron/ping service at the endpoints below:
 
 ```bash
-celery -A emergency_news worker -l info
+curl "https://your-api.example.com/api/cron/fetch/?token=$CRON_SECRET"
+curl "https://your-api.example.com/api/cron/cleanup/?token=$CRON_SECRET"
 ```
 
-3. Start Celery beat scheduler (for periodic fetching):
+3. Fetch news manually (optional):
 
 ```bash
-celery -A emergency_news beat -l info
-```
-
-4. Fetch news manually (optional):
-
-```bash
-python manage.py fetch_bbc_news
-python manage.py fetch_cnn_news
-# ... and others
+python manage.py get_all_news
+# or
+python manual_tasks.py
 ```
 
 ---
@@ -167,19 +159,32 @@ Example:
 
 ---
 
-## Celery & Scheduled Tasks
+## Cron Endpoints
 
-The project uses **Celery** for background tasks and scheduling. News fetching tasks are run every hour automatically:
+Periodic work is triggered by an external cron/ping service. The endpoints
+return `202 Accepted` immediately and run the work in a background thread pool
+inside the web process.
 
-| Task Name                 | Source        |
-| ------------------------- | ------------- |
-| `fetch_bbc_news`          | BBC           |
-| `fetch_cnn_news`          | CNN           |
-| `fetch_vanguard_news`     | Vanguard      |
-| `fetch_aljazeera_news`    | Al Jazeera    |
-| `fetch_guardian_news`     | The Guardian  |
-| `fetch_channelstv_news`   | Channels TV   |
-| `fetch_premiumtimes_news` | Premium Times |
+> The old Celery/Redis/Docker files may still be present in the repository for
+> reference, but the application no longer starts or requires them.
+
+| Method | Endpoint | Description |
+| ------ | -------- | ----------- |
+| GET/POST | `/api/cron/fetch/` | Fetch every registered source |
+| GET/POST | `/api/cron/fetch/<command_name>/` | Fetch one source, e.g. `fetch_bbc_news` |
+| GET/POST | `/api/cron/cleanup/` | Delete articles older than 31 days |
+| GET/POST | `/api/cron/populate-countries/` | Seed `Country` rows from `SOURCE_COUNTRY_MAP` |
+| GET | `/api/cron/runs/` | List recent in-process runs |
+| GET | `/api/cron/runs/<run_id>/` | Check one run's status/result |
+| GET | `/api/cron/` | Discovery/health response |
+
+If `CRON_SECRET` is set, include it as `X-Cron-Secret: <secret>` or
+`?token=<secret>`. Example hourly pings:
+
+```bash
+curl -H "X-Cron-Secret: $CRON_SECRET" https://your-api.example.com/api/cron/fetch/
+curl -H "X-Cron-Secret: $CRON_SECRET" https://your-api.example.com/api/cron/cleanup/
+```
 
 ---
 

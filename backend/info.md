@@ -1,24 +1,23 @@
 FOR AUTOMATIC FETCHING
 
+Celery/Redis are no longer used. An external cron/ping service should call:
 
-Restart your Celery worker:
-    celery -A emergency_news worker -l info
-Restart Celery Beat (if running separately):
-    celery -A emergency_news beat -l info
-Trigger the task manually (optional, to test):
-    python manage.py shell
+    GET https://your-api.example.com/api/cron/fetch/
+    GET https://your-api.example.com/api/cron/cleanup/
 
-from newsfeeds.tasks import fetch_bbc_news, fetch_cnn_news, fetch_vanguard_news, fetch_aljazeera_news, fetch_guardian_news, fetch_channelstv_news, fetch_premiumtimes_news,fetch_allafrica_news, fetch_modernghana_news, fetch_myjoyonline_news, fetch_ghheadlines_news
+If CRON_SECRET is set, add the secret as a header or query parameter:
 
-fetch_bbc_news.delay()
-fetch_cnn_news.delay()
-fetch_vanguard_news.delay()
-fetch_aljazeera_news.delay()
-fetch_guardian_news.delay()
-fetch_channelstv_news.delay()
-fetch_premiumtimes_news.delay()
-fetch_allafrica_news.delay()
-fetch_modernghana_news.delay()
-fetch_myjoyonline_news.delay()
-fetch_ghheadlines_news.delay()
+    curl -H "X-Cron-Secret: $CRON_SECRET" https://your-api.example.com/api/cron/fetch/
+    curl "https://your-api.example.com/api/cron/fetch/?token=$CRON_SECRET"
 
+The endpoints return 202 immediately and continue working in the background.
+Check progress with:
+
+    GET /api/cron/runs/
+    GET /api/cron/runs/<run_id>/
+
+Trigger a fetch manually (synchronous, may take a while):
+
+    python manage.py get_all_news
+    # or
+    python manual_tasks.py

@@ -1,14 +1,8 @@
 version: "3.9"
 
+# Optional local container setup. Celery/Redis are no longer used; periodic
+# work is triggered through the /api/cron/ endpoints.
 services:
-  redis:
-    image: redis:7-alpine
-    container_name: emergency_news_redis
-    ports:
-      - "6380:6379"   # host port 6380 -> container port 6379
-    networks:
-      - backend_network
-
   django:
     build:
       context: .
@@ -21,49 +15,7 @@ services:
       - .:/app
     ports:
       - "9000:9000"
-    depends_on:
-      - redis
     environment:
-      REDIS_URL: redis://redis:6379/0   # internal Docker connection stays the same
-    networks:
-      - backend_network
-
-  celery_worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: emergency_news_celery_worker
-    command: >
-      sh -c "python manage.py migrate --noinput &&
-             celery -A emergency_news worker -l info"
-    volumes:
-      - .:/app
-    depends_on:
-      - django
-      - redis
-    environment:
-      REDIS_URL: redis://redis:6379/0
-    networks:
-      - backend_network
-
-  celery_beat:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: emergency_news_celery_beat
-    command: >
-      sh -c "python manage.py migrate --noinput &&
-             celery -A emergency_news beat -l info"
-    volumes:
-      - .:/app
-    depends_on:
-      - django
-      - redis
-    environment:
-      REDIS_URL: redis://redis:6379/0
-    networks:
-      - backend_network
-
-networks:
-  backend_network:
-    driver: bridge
+      CRON_SECRET: ${CRON_SECRET:-}
+      CRON_MAX_WORKERS: ${CRON_MAX_WORKERS:-4}
+      CRON_FETCH_CONCURRENCY: ${CRON_FETCH_CONCURRENCY:-4}

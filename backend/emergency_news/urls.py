@@ -25,6 +25,7 @@ urlpatterns = [
     path("", hello_world, name="hello-world"),  # 👈 Add this line for root endpoint
     path("admin/", admin.site.urls),
     path("api/", include("newsfeeds.urls")),
+    path("api/cron/", include("cron_tasks.urls", namespace="cron_tasks")),
 
     # Swagger & ReDoc routes
     re_path(r"^swagger(?P<format>\.json|\.yaml)$",

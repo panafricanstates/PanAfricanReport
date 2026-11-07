@@ -6,6 +6,13 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+def _env_int(name: str, default: int) -> int:
+    try:
+        return max(1, int(os.getenv(name, str(default))))
+    except (TypeError, ValueError):
+        return default
+
 # --- Security & Debug ---
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-placeholder-key")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
@@ -26,6 +33,7 @@ INSTALLED_APPS = [
     "django_filters",
     'drf_yasg',
     "newsfeeds",
+    "cron_tasks",
     "corsheaders",
 ]
 
@@ -126,39 +134,11 @@ MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 # Optional but recommended
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# --- Celery & Redis ---
-# settings.py
-
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://red-d42qfff5r7bs73b96bqg:6379/0",  # your Redis URL
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-    }
-}
-
-# Optional — helps ensure Django sessions also use Redis (recommended for performance)
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
-
-
-
-# For Local
-# REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-# CELERY_BROKER_URL = REDIS_URL
-# CELERY_RESULT_BACKEND = REDIS_URL
-
-
-# For Docker (container Redis)
-REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
-
-# For Local Redis
-# REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-
-CELERY_BROKER_URL = REDIS_URL
-CELERY_RESULT_BACKEND = REDIS_URL
+# --- Cron endpoints (external pinger; no Celery/Redis) ---
+# If CRON_SECRET is set, callers must send it as X-Cron-Secret or ?token=...
+CRON_SECRET = os.getenv("CRON_SECRET", "report123")
+CRON_MAX_WORKERS = _env_int("CRON_MAX_WORKERS", 4)
+CRON_FETCH_CONCURRENCY = _env_int("CRON_FETCH_CONCURRENCY", 4)
 
 
 # --- Default Primary Key ---

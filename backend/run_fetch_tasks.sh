@@ -1,10 +1,8 @@
 #!/bin/bash
-# run_all_fetch_tasks.sh
+# Run all news fetches synchronously without Docker/Celery.
 
-# Exit immediately if a command exits with a non-zero status
 set -e
 
-# Activate the virtual environment
 if [ -f "venv/bin/activate" ]; then
     echo "Activating virtual environment..."
     source venv/bin/activate
@@ -13,10 +11,8 @@ else
     exit 1
 fi
 
-# Run the fetch tasks inside Docker
-echo "Running fetch tasks inside Docker..."
-docker-compose run django python manual_tasks.py
+echo "Running fetch tasks..."
+python manual_tasks.py
 
-# Deactivate virtual environment
 deactivate
 echo "Done."

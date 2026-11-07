@@ -1,17 +1,24 @@
-# newsfeeds/management/commands/get_all_news.py
 from django.core.management.base import BaseCommand
-import newsfeeds.tasks  # import the module where tasks live
-from newsfeeds.news_commands import NEWS_COMMANDS
+
+from cron_tasks.jobs import fetch_all_sources
+
 
 class Command(BaseCommand):
-    help = "Trigger all news fetching Celery tasks"
+    help = (
+        "Fetch all registered news sources synchronously. "
+        "Scheduled runs should use GET /api/cron/fetch/ instead."
+    )
 
     def handle(self, *args, **kwargs):
-        for cmd_name in NEWS_COMMANDS:
-            # get the dynamically created task from the tasks module
-            task = getattr(newsfeeds.tasks, cmd_name, None)
-            if task:
-                task.delay()
-                self.stdout.write(self.style.SUCCESS(f"Triggered {cmd_name}"))
-            else:
-                self.stdout.write(self.style.WARNING(f"Task {cmd_name} not found in newsfeeds.tasks"))
+        result = fetch_all_sources()
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Fetched {result['total']} sources: "
+                f"{result['succeeded']} succeeded, {result['failed']} failed."
+            )
+        )
+        for item in result["results"]:
+            if item["status"] == "failed":
+                self.stdout.write(
+                    self.style.ERROR(f"{item['command']}: {item.get('error')}")
+                )

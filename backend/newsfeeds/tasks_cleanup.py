@@ -1,9 +1,15 @@
-from celery import shared_task
-from django.utils import timezone
+"""Legacy cleanup helper.
+
+Use ``cron_tasks.jobs.cleanup_old_news`` for the active implementation.
+"""
+
 from datetime import timedelta
+
+from django.utils import timezone
+
 from .models import NewsArticle
 
-@shared_task(name="cleanup_old_news")
+
 def cleanup_old_news():
     cutoff_date = timezone.now() - timedelta(days=31)
     deleted_count, _ = NewsArticle.objects.filter(

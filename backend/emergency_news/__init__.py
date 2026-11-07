@@ -1,4 +1,5 @@
 # emergency_news/__init__.py
 
-from .celery import app as celery_app
-__all__ = ('celery_app',)
+# Celery is intentionally not imported. Periodic work is triggered through the
+# /api/cron/ endpoints in the cron_tasks app.
+
