@@ -66,7 +66,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # local Next.js dev server
-    "https://ubuntureport.vercel.app",  # production Next.js
+    "https://panafricanreport.vercel.app",  # production Next.js
 ]
 
 

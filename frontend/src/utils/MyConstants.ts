@@ -4,9 +4,9 @@
 
 // export const DJANGO_API = "http://127.0.0.1:8000/api"
 
-export const UBUNTU_REPORT_URL = "https://ubuntureport.vercel.app"
+export const UBUNTU_REPORT_URL = "https://panafricanreport.vercel.app"
 
-export const DJANGO_API = "https://ubuntureport.onrender.com/api"
+export const DJANGO_API = "https://panafricanreport.onrender.com/api"
 
 
 
